@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ test.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 680px;">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/quiz">{{ ct('com_quiz.web.intro.back') }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ test.title }}</li>
+    </ol>
+  </nav>
+
+  <h1 class="mb-3">{{ test.title }}</h1>
+
+  {% if test.description %}
+  <p class="lead mb-4">{{ test.description }}</p>
+  {% endif %}
+
+  <div class="card mb-4">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item d-flex justify-content-between">
+        <span class="text-body-secondary">{{ ct('com_quiz.web.intro.questions') }}</span>
+        <span class="fw-semibold">{{ test.question_count }}</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between">
+        <span class="text-body-secondary">{{ ct('com_quiz.web.intro.passing') }}</span>
+        <span class="fw-semibold">{{ test.passing_score }} %</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between">
+        <span class="text-body-secondary">{{ ct('com_quiz.web.intro.time_limit') }}</span>
+        <span class="fw-semibold">
+          {% if test.time_limit %}{{ test.time_limit }} min{% else %}{{ ct('com_quiz.web.intro.time_limit_none') }}{% endif %}
+        </span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between">
+        <span class="text-body-secondary">{{ ct('com_quiz.web.intro.shuffle') }}</span>
+        <span class="fw-semibold">
+          {% if test.shuffle_questions %}{{ ct('com_quiz.web.intro.yes') }}{% else %}{{ ct('com_quiz.web.intro.no') }}{% endif %}
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <form method="post" action="/quiz/{{ test.slug }}/start">
+    <button type="submit" class="btn btn-primary btn-lg">
+      <i class="bi bi-play-fill me-1" aria-hidden="true"></i>{{ ct('com_quiz.web.intro.start') }}
+    </button>
+    <a href="/quiz" class="btn btn-outline-secondary btn-lg ms-2">{{ ct('com_quiz.web.intro.back') }}</a>
+  </form>
+</div>
+{% endblock %}

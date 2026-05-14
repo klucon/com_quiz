@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{{ ct('com_quiz.web.question.heading', n=n, total=total) }}{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 760px;">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <span class="text-body-secondary small">{{ test.title }}</span>
+    {% if time_limit %}
+    <span class="badge bg-warning-subtle text-warning-emphasis" id="timer-badge">
+      <i class="bi bi-clock me-1" aria-hidden="true"></i>
+      <span id="timer-display">{{ ct('com_quiz.web.question.time_remaining') }}</span>
+    </span>
+    {% endif %}
+  </div>
+
+  <div class="mb-2">
+    <div class="progress" style="height: 6px;" role="progressbar" aria-valuenow="{{ n }}" aria-valuemin="0" aria-valuemax="{{ total }}">
+      <div class="progress-bar" style="width: {{ (n / total * 100) | round }}%"></div>
+    </div>
+    <div class="d-flex justify-content-between mt-1">
+      <small class="text-body-secondary">{{ ct('com_quiz.web.question.heading', n=n, total=total) }}</small>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <p class="fs-5 mb-0">{{ question.text }}</p>
+    </div>
+  </div>
+
+  <form method="post" action="/quiz/{{ test.slug }}/q/{{ n }}?token={{ token }}" id="answer-form">
+    <div class="list-group mb-4" id="answers-list">
+      {% for ans in answers %}
+      <label class="list-group-item list-group-item-action d-flex gap-2 align-items-center" style="cursor:pointer;">
+        <input class="form-check-input flex-shrink-0 mt-0" type="radio" name="answer_id" value="{{ ans.id }}" required>
+        <span>{{ ans.text }}</span>
+      </label>
+      {% endfor %}
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">
+        {{ ct('com_quiz.web.question.submit') }}
+      </button>
+      <button type="submit" form="skip-form" class="btn btn-outline-secondary">
+        {{ ct('com_quiz.web.question.skip') }}
+      </button>
+    </div>
+  </form>
+
+  <form method="post" action="/quiz/{{ test.slug }}/q/{{ n }}?token={{ token }}" id="skip-form">
+    <input type="hidden" name="answer_id" value="">
+  </form>
+</div>
+
+{% if time_limit %}
+<script>
+(function () {
+  const END_KEY = 'quiz_end_{{ token }}';
+  const limit = {{ time_limit }} * 60;
+  if (!sessionStorage.getItem(END_KEY)) {
+    sessionStorage.setItem(END_KEY, Date.now() + limit * 1000);
+  }
+  const endTime = parseInt(sessionStorage.getItem(END_KEY));
+
+  function tick() {
+    const remaining = Math.max(0, Math.round((endTime - Date.now()) / 1000));
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    document.getElementById('timer-display').textContent =
+      m + ':' + String(s).padStart(2, '0');
+    if (remaining <= 0) {
+      sessionStorage.removeItem(END_KEY);
+      document.getElementById('skip-form').submit();
+      return;
+    }
+    setTimeout(tick, 1000);
+  }
+  tick();
+})();
+</script>
+{% endif %}
+{% endblock %}

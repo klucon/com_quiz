@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ ct('com_quiz.settings.heading') }}{% endblock %}
+{% block heading %}{{ ct('com_quiz.settings.heading') }}{% endblock %}
+
+{% block toolbar %}
+<div class="cms-toolbar" role="toolbar">
+  <a href="/admin/com_quiz" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if flash %}
+<div class="alert alert-{{ flash.type }} alert-dismissible mb-4" role="alert">
+  {{ flash.text }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('alert.close') }}"></button>
+</div>
+{% endif %}
+
+<div class="card" style="max-width: 640px;">
+  <div class="card-body">
+    <form method="post" action="/admin/com_quiz/settings">
+      <p class="text-body-secondary">Aktuálně nejsou k dispozici žádná nastavení.</p>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">{{ t('toolbar.save') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

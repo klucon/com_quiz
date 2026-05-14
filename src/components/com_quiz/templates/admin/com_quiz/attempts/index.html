@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ ct('com_quiz.admin.attempt.heading') }}{% endblock %}
+{% block heading %}{{ ct('com_quiz.admin.attempt.heading') }}{% endblock %}
+
+{% block toolbar %}
+<div class="cms-toolbar" role="toolbar">
+  <a href="/admin/com_quiz" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if flash %}
+<div class="alert alert-{{ flash.type }} alert-dismissible mb-4" role="alert">
+  {{ flash.text }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('alert.close') }}"></button>
+</div>
+{% endif %}
+
+{% if not attempts %}
+<div class="card">
+  <div class="card-body text-center py-5 text-body-secondary fst-italic">
+    <i class="bi bi-person-check fs-2 d-block mb-2" aria-hidden="true"></i>
+    {{ ct('com_quiz.admin.attempt.empty') }}
+  </div>
+</div>
+{% else %}
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <caption class="visually-hidden">{{ ct('com_quiz.admin.attempt.heading') }}</caption>
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="ps-3">{{ ct('com_quiz.admin.attempt.col.test') }}</th>
+            <th scope="col" class="text-center">{{ ct('com_quiz.admin.attempt.col.score') }}</th>
+            <th scope="col">{{ ct('com_quiz.admin.attempt.col.passed') }}</th>
+            <th scope="col">{{ ct('com_quiz.admin.attempt.col.finished') }}</th>
+            <th scope="col" class="pe-3">{{ ct('com_quiz.admin.attempt.col.duration') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for attempt in attempts %}
+          {% set test = tests_map.get(attempt.test_id) %}
+          <tr>
+            <td class="ps-3 small">{{ test.title if test else attempt.test_id }}</td>
+            <td class="text-center fw-semibold">{{ attempt.score }} %</td>
+            <td>
+              {% if attempt.passed %}
+              <span class="badge bg-success-subtle text-success-emphasis">{{ ct('com_quiz.admin.attempt.passed') }}</span>
+              {% else %}
+              <span class="badge bg-danger-subtle text-danger-emphasis">{{ ct('com_quiz.admin.attempt.failed') }}</span>
+              {% endif %}
+            </td>
+            <td class="small text-body-secondary">{{ attempt.finished_at | dateformat if attempt.finished_at else '—' }}</td>
+            <td class="pe-3 small text-body-secondary">
+              {% if attempt.started_at and attempt.finished_at %}
+              {% set secs = (attempt.finished_at - attempt.started_at).total_seconds() | int %}
+              {{ (secs // 60) }}:{{ '%02d' | format(secs % 60) }}
+              {% else %}—{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

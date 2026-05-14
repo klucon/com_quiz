@@ -1,0 +1,41 @@
+name: Release Package
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate manifest version
+        run: |
+          MANIFEST_VERSION=$(python3 -c "import json; print(json.load(open('src/components/com_quiz/manifest.json'))['version'])")
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$MANIFEST_VERSION" != "$TAG_VERSION" ]; then
+            echo "Version mismatch: manifest=$MANIFEST_VERSION tag=$TAG_VERSION"
+            exit 1
+          fi
+
+      - name: Build ZIP
+        run: |
+          cd src/components
+          zip -r ../../com_quiz-${GITHUB_REF_NAME}.zip com_quiz/ \
+            --exclude "**/__pycache__/*" \
+            --exclude "**/*.pyc" \
+            --exclude "**/*.pyo"
+
+      - name: Generate SHA256SUMS
+        run: sha256sum com_quiz-${GITHUB_REF_NAME}.zip > SHA256SUMS
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            com_quiz-${{ github.ref_name }}.zip
+            SHA256SUMS

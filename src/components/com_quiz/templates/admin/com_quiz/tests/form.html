@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}{% if test %}{{ ct('com_quiz.admin.test.edit') }}{% else %}{{ ct('com_quiz.admin.test.new') }}{% endif %}{% endblock %}
+{% block heading %}{% if test %}{{ ct('com_quiz.admin.test.edit') }}{% else %}{{ ct('com_quiz.admin.test.new') }}{% endif %}{% endblock %}
+
+{% block toolbar %}
+<div class="cms-toolbar" role="toolbar">
+  <a href="/admin/com_quiz/tests" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if flash %}
+<div class="alert alert-{{ flash.type }} alert-dismissible mb-4" role="alert">
+  {{ flash.text }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('alert.close') }}"></button>
+</div>
+{% endif %}
+
+<div class="card" style="max-width: 760px;">
+  <div class="card-body">
+    <form method="post" action="{% if test %}/admin/com_quiz/tests/{{ test.id }}/edit{% else %}/admin/com_quiz/tests/new{% endif %}">
+
+      <div class="mb-3">
+        <label for="title" class="form-label fw-semibold">{{ ct('com_quiz.admin.test.field.title') }} <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="title" name="title" required
+               value="{{ test.title if test else '' }}">
+      </div>
+
+      <div class="mb-3">
+        <label for="category_id" class="form-label fw-semibold">{{ ct('com_quiz.admin.test.field.category') }} <span class="text-danger">*</span></label>
+        <select class="form-select" id="category_id" name="category_id" required>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if test and test.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="slug" class="form-label fw-semibold">{{ ct('com_quiz.admin.test.field.slug') }}</label>
+        <input type="text" class="form-control font-monospace" id="slug" name="slug"
+               pattern="[a-z0-9-]*" value="{{ test.slug if test else '' }}" placeholder="auto">
+        <div class="form-text">{{ ct('com_quiz.admin.test.slug_hint') }}</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label fw-semibold">{{ ct('com_quiz.admin.test.field.description') }}</label>
+        <textarea class="form-control" id="description" name="description" rows="3">{{ test.description if test else '' }}</textarea>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+          <label for="status" class="form-label fw-semibold">{{ ct('com_quiz.admin.test.field.status') }}</label>
+          <select class="form-select" id="status" name="status">
+            <option value="draft" {% if not test or test.status == 'draft' %}selected{% endif %}>{{ ct('com_quiz.admin.test.status.draft') }}</option>
+            <option value="published" {% if test and test.status == 'published' %}selected{% endif %}>{{ ct('com_quiz.admin.test.status.published') }}</option>
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <label for="question_count" class="form-label fw-semibold">{{ ct('com_quiz.admin.test.field.question_count') }}</label>
+          <input type="number" class="form-control" id="question_count" name="question_count" min="1"
+                 value="{{ test.question_count if test else 20 }}">
+        </div>
+        <div class="col-sm-3">
+          <label for="passing_score" class="form-label fw-semibold">{{ ct('com_quiz.admin.test.field.passing_score') }}</label>
+          <input type="number" class="form-control" id="passing_score" name="passing_score" min="0" max="100"
+                 value="{{ test.passing_score if test else 70 }}">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="time_limit" class="form-label fw-semibold">{{ ct('com_quiz.admin.test.field.time_limit') }}</label>
+        <input type="number" class="form-control" id="time_limit" name="time_limit" min="1" style="max-width: 160px;"
+               value="{{ test.time_limit if test and test.time_limit else '' }}" placeholder="—">
+      </div>
+
+      <div class="mb-3">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="shuffle_questions" name="shuffle_questions" value="1"
+                 {% if not test or test.shuffle_questions %}checked{% endif %}>
+          <label class="form-check-label" for="shuffle_questions">{{ ct('com_quiz.admin.test.field.shuffle_questions') }}</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="shuffle_answers" name="shuffle_answers" value="1"
+                 {% if not test or test.shuffle_answers %}checked{% endif %}>
+          <label class="form-check-label" for="shuffle_answers">{{ ct('com_quiz.admin.test.field.shuffle_answers') }}</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="show_correct_answers" name="show_correct_answers" value="1"
+                 {% if not test or test.show_correct_answers %}checked{% endif %}>
+          <label class="form-check-label" for="show_correct_answers">{{ ct('com_quiz.admin.test.field.show_correct_answers') }}</label>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="sort_order" class="form-label fw-semibold">{{ ct('com_quiz.admin.test.field.sort_order') }}</label>
+        <input type="number" class="form-control" id="sort_order" name="sort_order" style="max-width: 120px;"
+               value="{{ test.sort_order if test else 0 }}">
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">{{ t('toolbar.save') }}</button>
+        <a href="/admin/com_quiz/tests" class="btn btn-outline-secondary">{{ t('toolbar.cancel') }}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

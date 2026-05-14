@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ ct('com_quiz.web.index.heading') }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-4">{{ ct('com_quiz.web.index.heading') }}</h1>
+
+  {% if not tests %}
+  <p class="text-body-secondary fst-italic">{{ ct('com_quiz.web.index.empty') }}</p>
+  {% else %}
+  <div class="row g-3">
+    {% for test in tests %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ test.title }}</h5>
+          {% if test.description %}
+          <p class="card-text text-body-secondary small">{{ test.description | truncate(120) }}</p>
+          {% endif %}
+          <ul class="list-unstyled small text-body-secondary mb-3">
+            <li><i class="bi bi-question-circle me-1" aria-hidden="true"></i>{{ test.question_count }} {{ ct('com_quiz.web.index.questions') }}</li>
+            <li><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>{{ ct('com_quiz.web.index.passing', n=test.passing_score) }}</li>
+            {% if test.time_limit %}
+            <li><i class="bi bi-clock me-1" aria-hidden="true"></i>{{ ct('com_quiz.web.index.time_limit', n=test.time_limit) }}</li>
+            {% endif %}
+          </ul>
+          <a href="/quiz/{{ test.slug }}" class="btn btn-primary btn-sm">
+            {{ ct('com_quiz.web.index.start') }}
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

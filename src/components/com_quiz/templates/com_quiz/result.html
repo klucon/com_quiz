@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ ct('com_quiz.web.result.heading') }} – {{ test.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 800px;">
+  <h1 class="mb-1">{{ ct('com_quiz.web.result.heading') }}</h1>
+  <p class="text-body-secondary mb-4">{{ test.title }}</p>
+
+  {% set correct_count = detail | selectattr('is_correct') | list | length %}
+  {% set total_count = detail | length %}
+
+  <div class="card mb-4 {% if attempt.passed %}border-success{% else %}border-danger{% endif %}">
+    <div class="card-body text-center py-4">
+      <div class="display-4 fw-bold {% if attempt.passed %}text-success{% else %}text-danger{% endif %}">
+        {{ attempt.score }} %
+      </div>
+      <div class="fs-5 mt-1 {% if attempt.passed %}text-success{% else %}text-danger{% endif %}">
+        {% if attempt.passed %}
+        <i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>{{ ct('com_quiz.web.result.passed') }}
+        {% else %}
+        <i class="bi bi-x-circle-fill me-1" aria-hidden="true"></i>{{ ct('com_quiz.web.result.failed') }}
+        {% endif %}
+      </div>
+      <div class="text-body-secondary small mt-2">
+        {{ ct('com_quiz.web.result.correct') }}: <strong>{{ correct_count }}</strong> {{ ct('com_quiz.web.result.of') }} {{ total_count }}
+        &nbsp;&bull;&nbsp;
+        {{ ct('com_quiz.web.result.passing_score') }}: {{ test.passing_score }} %
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2 mb-5">
+    <a href="/quiz/{{ test.slug }}/pdf?token={{ attempt.session_token }}" class="btn btn-outline-primary">
+      <i class="bi bi-file-earmark-pdf me-1" aria-hidden="true"></i>{{ ct('com_quiz.web.result.download_pdf') }}
+    </a>
+    <a href="/quiz/{{ test.slug }}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>{{ ct('com_quiz.web.result.try_again') }}
+    </a>
+    <a href="/quiz" class="btn btn-outline-secondary">
+      <i class="bi bi-list-ul me-1" aria-hidden="true"></i>{{ ct('com_quiz.web.result.back') }}
+    </a>
+  </div>
+
+  <h2 class="h5 mb-3">{{ ct('com_quiz.web.result.detail') }}</h2>
+
+  {% for row in detail %}
+  <div class="card mb-3 {% if row.is_correct %}border-success-subtle{% else %}border-danger-subtle{% endif %}">
+    <div class="card-body">
+      <div class="d-flex gap-2 mb-2">
+        {% if row.is_correct %}
+        <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1" aria-hidden="true"></i>
+        {% else %}
+        <i class="bi bi-x-circle-fill text-danger flex-shrink-0 mt-1" aria-hidden="true"></i>
+        {% endif %}
+        <p class="mb-0 fw-semibold">{{ row.question.text }}</p>
+      </div>
+
+      {% if not row.is_correct %}
+      <div class="ms-4 small">
+        {% if row.chosen %}
+        <div class="text-danger mb-1">
+          <span class="text-body-secondary">{{ ct('com_quiz.web.result.your_answer') }}:</span> {{ row.chosen.text }}
+        </div>
+        {% endif %}
+        {% if test.show_correct_answers and row.correct_answer %}
+        <div class="text-success mb-1">
+          <span class="text-body-secondary">{{ ct('com_quiz.web.result.correct_answer') }}:</span> {{ row.correct_answer.text }}
+        </div>
+        {% endif %}
+        {% if row.question.explanation %}
+        <div class="text-body-secondary border-start border-3 ps-2 mt-2">
+          <strong>{{ ct('com_quiz.web.result.explanation') }}:</strong> {{ row.question.explanation }}
+        </div>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="ms-4 small text-success">
+        {{ row.chosen.text if row.chosen else '—' }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

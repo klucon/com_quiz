@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "name": "com_quiz",
+  "type": "component",
+  "vendor": "klucon",
+  "extension_id": "klucon/com_quiz",
+  "version": "0.1.0",
+  "display_name": "Kvízy a testy",
+  "display_name_key": "components.name.com_quiz",
+  "description": "Systém pro tvorbu a správu testů a kvízů s anonymním hodnocením a exportem výsledků do PDF.",
+  "license": "MIT",
+  "author": {
+    "name": "KLUCON",
+    "url": "https://klucon.cz"
+  },
+  "links": {
+    "homepage": "https://marketplace.klucon.cz",
+    "repository": "https://github.com/klucon/com_quiz"
+  },
+  "compatibility": {
+    "core_min": "0.1.0",
+    "core_max": null,
+    "python": ">=3.12",
+    "database": ["mysql", "postgresql"]
+  },
+  "package": {
+    "python_package": "com_quiz",
+    "entrypoint": "src.components.com_quiz",
+    "setup_function": "setup",
+    "admin_router": "admin.router",
+    "web_views": [],
+    "settings_url": "/admin/com_quiz/settings"
+  },
+  "routes": {
+    "admin": {
+      "enabled": true,
+      "prefix": "/admin/com_quiz",
+      "nav_label": "components.name.com_quiz",
+      "nav_icon": "patch-question",
+      "nav_order": 130
+    },
+    "web": {
+      "enabled": true
+    }
+  },
+  "permissions": [
+    {
+      "key": "quiz.view",
+      "label": "permissions.quiz.view"
+    },
+    {
+      "key": "quiz.manage",
+      "label": "permissions.quiz.manage"
+    },
+    {
+      "key": "quiz.export",
+      "label": "permissions.quiz.export"
+    }
+  ],
+  "i18n": {
+    "domain": "com_quiz",
+    "locales_path": "i18n",
+    "required_locales": ["cs_CZ", "en_GB"]
+  },
+  "migrations": {
+    "enabled": false,
+    "path": "migrations"
+  },
+  "security": {
+    "requires_signature": true,
+    "capabilities": ["database.write", "admin.routes", "web.views"]
+  },
+  "marketplace": {
+    "category": "content",
+    "tags": ["quiz", "test", "questions", "pdf"],
+    "featured": false
+  },
+  "dashboard": {
+    "quick_icon": {
+      "enabled": true,
+      "label": "Kvízy",
+      "description": "Správa testů a kvízů.",
+      "icon": "patch-question",
+      "url": "/admin/com_quiz",
+      "order": 130
+    }
+  },
+  "admin_url": "/admin/com_quiz",
+  "min_cms_version": "0.1.0",
+  "categories": ["content"],
+  "supported_locales": ["cs_CZ", "en_GB"],
+  "changelog": "První verze komponenty pro správu testů a kvízů s anonymním hodnocením a PDF exportem."
+}

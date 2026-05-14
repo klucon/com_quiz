@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ ct('com_quiz.admin.question.heading') }}{% endblock %}
+{% block heading %}{{ ct('com_quiz.admin.question.heading') }}{% endblock %}
+
+{% block toolbar %}
+<div class="cms-toolbar" role="toolbar">
+  <a href="/admin/com_quiz/questions/new" class="btn btn-sm btn-primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ ct('com_quiz.admin.question.new') }}
+  </a>
+  <a href="/admin/com_quiz" class="btn btn-sm btn-outline-secondary ms-1">
+    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if flash %}
+<div class="alert alert-{{ flash.type }} alert-dismissible mb-4" role="alert">
+  {{ flash.text }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('alert.close') }}"></button>
+</div>
+{% endif %}
+
+<div class="mb-3">
+  <form method="get" action="/admin/com_quiz/questions" class="d-flex align-items-center gap-2">
+    <select name="category" class="form-select form-select-sm" style="max-width: 260px;" onchange="this.form.submit()">
+      <option value="">{{ ct('com_quiz.admin.question.filter.all_categories') }}</option>
+      {% for cat in categories %}
+      <option value="{{ cat.id }}" {% if selected_category == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+
+{% if not questions %}
+<div class="card">
+  <div class="card-body text-center py-5 text-body-secondary fst-italic">
+    <i class="bi bi-question-circle fs-2 d-block mb-2" aria-hidden="true"></i>
+    {{ ct('com_quiz.admin.question.empty') }}
+  </div>
+</div>
+{% else %}
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <caption class="visually-hidden">{{ ct('com_quiz.admin.question.heading') }}</caption>
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="ps-3">{{ ct('com_quiz.admin.question.col.text') }}</th>
+            <th scope="col">{{ ct('com_quiz.admin.question.col.category') }}</th>
+            <th scope="col" class="text-center">{{ ct('com_quiz.admin.question.col.sort_order') }}</th>
+            <th scope="col" class="pe-3">{{ ct('com_quiz.admin.question.col.actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for q in questions %}
+          <tr>
+            <td class="ps-3">{{ q.text | truncate(80) }}</td>
+            <td class="small text-body-secondary">
+              {% for cat in categories %}{% if cat.id == q.category_id %}{{ cat.name }}{% endif %}{% endfor %}
+            </td>
+            <td class="text-center small text-body-secondary">{{ q.sort_order }}</td>
+            <td class="pe-3 text-end">
+              <a href="/admin/com_quiz/questions/{{ q.id }}/edit"
+                 class="btn btn-sm btn-outline-secondary me-1"
+                 title="{{ ct('com_quiz.admin.question.edit') }}">
+                <i class="bi bi-pencil" aria-hidden="true"></i>
+              </a>
+              <form method="post" action="/admin/com_quiz/questions/{{ q.id }}/delete" class="d-inline"
+                    data-cms-confirm="{{ ct('com_quiz.admin.question.delete_confirm') }}">
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ ct('com_quiz.admin.question.delete') }}">
+                  <i class="bi bi-trash" aria-hidden="true"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
