@@ -4,23 +4,20 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .models import QuizAnswer, QuizQuestion
 from .service import (
     build_category_payload,
     build_question_payload,
     create_category,
     create_question,
     get_category_by_slug,
-    get_question,
-    update_category,
-    update_question,
 )
-from .models import QuizQuestion, QuizAnswer
-from sqlalchemy import select, delete
 
 
-async def import_from_json(db: AsyncSession, path: Path) -> dict[str, int]:
+async def import_from_json(db: AsyncSession, path: Path) -> dict:
     """Import questions from a legacy JSON file.
 
     Expected format:
@@ -34,31 +31,49 @@ async def import_from_json(db: AsyncSession, path: Path) -> dict[str, int]:
       },
       ...
     ]
-    Returns a dict with counts: {"created": N, "skipped": N, "errors": N}.
     """
     raw = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(raw, list):
-        raise ValueError("JSON must be a list of question objects.")
+        raise ValueError("JSON musí být pole objektů.")
 
-    stats: dict[str, int] = {"created": 0, "skipped": 0, "errors": 0}
+    stats: dict = {"created": 0, "errors": 0, "first_error": ""}
     category_cache: dict[str, int] = {}
 
+    # Pass 1: create all unique categories up front (single transaction context)
+    cat_names: list[str] = []
+    seen: set[str] = set()
+    for item in raw:
+        name = str(item.get("category", "Ostatní")).strip() or "Ostatní"
+        if name not in seen:
+            cat_names.append(name)
+            seen.add(name)
+
+    for cat_name in cat_names:
+        try:
+            payload = build_category_payload(
+                name=cat_name, slug="", description="", icon="", sort_order=0,
+            )
+            cat = await get_category_by_slug(db, payload.slug)
+            if cat is None:
+                cat = await create_category(db, payload)
+            category_cache[cat_name] = cat.id
+        except Exception as exc:
+            if not stats["first_error"]:
+                stats["first_error"] = f"Kategorie '{cat_name}': {exc!r}"
+
+    if not category_cache:
+        raise ValueError(stats["first_error"] or "Nepodařilo se vytvořit žádnou kategorii.")
+
+    await db.flush()
+
+    # Pass 2: import questions — each row in its own savepoint so one failure
+    # doesn't corrupt the session state for subsequent rows
     for item in raw:
         try:
             cat_name = str(item.get("category", "Ostatní")).strip() or "Ostatní"
-            if cat_name not in category_cache:
-                payload = build_category_payload(
-                    name=cat_name,
-                    slug="",
-                    description="",
-                    icon="",
-                    sort_order=0,
-                )
-                cat = await get_category_by_slug(db, payload.slug)
-                if cat is None:
-                    cat = await create_category(db, payload)
-                category_cache[cat_name] = cat.id
-            category_id = category_cache[cat_name]
+            category_id = category_cache.get(cat_name)
+            if category_id is None:
+                raise ValueError(f"Kategorie '{cat_name}' nebyla vytvořena.")
 
             question_text = str(item.get("question", "")).strip()
             answers_raw = [str(a) for a in item.get("answers", [])]
@@ -73,16 +88,19 @@ async def import_from_json(db: AsyncSession, path: Path) -> dict[str, int]:
                 answer_texts=answers_raw,
                 correct_index=correct_index,
             )
-            await create_question(db, payload_q)
+            async with db.begin_nested():
+                await create_question(db, payload_q)
             stats["created"] += 1
-        except Exception:
+        except Exception as exc:
             stats["errors"] += 1
+            if not stats["first_error"]:
+                stats["first_error"] = repr(exc)
 
     await db.commit()
     return stats
 
 
-async def import_from_json_upsert(db: AsyncSession, path: Path) -> dict[str, int]:
+async def import_from_json_upsert(db: AsyncSession, path: Path) -> dict:
     """Same as import_from_json but clears all existing questions first."""
     await db.execute(delete(QuizAnswer))
     await db.execute(delete(QuizQuestion))

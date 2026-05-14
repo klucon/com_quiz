@@ -547,9 +547,12 @@ async def import_submit(
         from .importer import import_from_json
         stats = await import_from_json(db, tmp_path)
         tmp_path.unlink(missing_ok=True)
+        flash_type = "success" if stats["created"] > 0 else "warning"
         msg = ct("com_quiz.success.imported",
                  created=stats["created"], errors=stats["errors"])
-        _flash(request, "success", msg)
+        if stats.get("first_error"):
+            msg += f"<br><small class='font-monospace'>{stats['first_error']}</small>"
+        _flash(request, flash_type, msg)
     except Exception as exc:
         _flash(request, "danger", str(exc))
     return RedirectResponse("/admin/com_quiz/import", status_code=303)
