@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Request
+import tempfile
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, File, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -508,6 +511,48 @@ async def settings_form(
         request=request, db=db, user=user, ct=await _ct(db),
         flash=flash,
     )
+
+
+# ---------------------------------------------------------------------------
+# Import
+# ---------------------------------------------------------------------------
+
+@router.get("/import", response_class=HTMLResponse)
+async def import_form(
+    request: Request,
+    user: CurrentAdminUser,
+    db: AsyncSession = Depends(get_db_session),
+) -> HTMLResponse:
+    flash = request.session.pop("flash", None)
+    return await admin_render(
+        "admin/com_quiz/import.html",
+        request=request, db=db, user=user, ct=await _ct(db),
+        flash=flash,
+    )
+
+
+@router.post("/import")
+async def import_submit(
+    request: Request,
+    user: CurrentAdminUser,
+    db: AsyncSession = Depends(get_db_session),
+    file: UploadFile = File(...),
+) -> Response:
+    ct = await _ct(db)
+    try:
+        content = await file.read()
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
+            tmp.write(content)
+            tmp_path = Path(tmp.name)
+        from .importer import import_from_json
+        stats = await import_from_json(db, tmp_path)
+        tmp_path.unlink(missing_ok=True)
+        msg = ct("com_quiz.success.imported",
+                 created=stats["created"], errors=stats["errors"])
+        _flash(request, "success", msg)
+    except Exception as exc:
+        _flash(request, "danger", str(exc))
+    return RedirectResponse("/admin/com_quiz/import", status_code=303)
 
 
 @router.post("/settings")

@@ -4,7 +4,7 @@
   "type": "component",
   "vendor": "klucon",
   "extension_id": "klucon/com_quiz",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "display_name": "Kvízy a testy",
   "display_name_key": "components.name.com_quiz",
   "description": "Systém pro tvorbu a správu testů a kvízů s anonymním hodnocením a exportem výsledků do PDF.",

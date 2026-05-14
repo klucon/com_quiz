@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ ct('com_quiz.admin.import.heading') }}{% endblock %}
+{% block heading %}{{ ct('com_quiz.admin.import.heading') }}{% endblock %}
+
+{% block toolbar %}
+<div class="cms-toolbar" role="toolbar">
+  <a href="/admin/com_quiz" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if flash %}
+<div class="alert alert-{{ flash.type }} alert-dismissible mb-4" role="alert">
+  {{ flash.text }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('alert.close') }}"></button>
+</div>
+{% endif %}
+
+<div class="card" style="max-width: 600px;">
+  <div class="card-body">
+    <div class="alert alert-warning d-flex gap-2 mb-4">
+      <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1" aria-hidden="true"></i>
+      <span>{{ ct('com_quiz.admin.import.warning') }}</span>
+    </div>
+
+    <form method="post" action="/admin/com_quiz/import" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="file" class="form-label fw-semibold">{{ ct('com_quiz.admin.import.file_label') }}</label>
+        <input type="file" class="form-control" id="file" name="file" accept=".json" required>
+        <div class="form-text">{{ ct('com_quiz.admin.import.hint') }}</div>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-upload me-1" aria-hidden="true"></i>{{ ct('com_quiz.admin.import.submit') }}
+      </button>
+    </form>
+
+    <hr class="my-4">
+    <div class="text-body-secondary small">
+      <strong>Očekávaný formát JSON:</strong>
+      <pre class="mt-2 bg-light p-3 rounded small"><code>[
+  {
+    "question": "Text otázky",
+    "answers": ["Odpověď A", "Odpověď B", "Odpověď C", "Odpověď D"],
+    "correct": 0,
+    "category": "Název kategorie",
+    "info": "Vysvětlení pro nesprávnou odpověď"
+  }
+]</code></pre>
+    </div>
+  </div>
+</div>
+{% endblock %}

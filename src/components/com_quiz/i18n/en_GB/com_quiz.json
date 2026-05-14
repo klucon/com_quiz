@@ -93,8 +93,16 @@
   "com_quiz.admin.attempt.passed": "Passed",
   "com_quiz.admin.attempt.failed": "Failed",
 
+  "com_quiz.admin.import.heading": "Import Questions from JSON",
+  "com_quiz.admin.import.file_label": "JSON file",
+  "com_quiz.admin.import.hint": "File must be a list of objects with keys: question, answers (array), correct (index), category, info.",
+  "com_quiz.admin.import.submit": "Import",
+  "com_quiz.admin.import.warning": "Import adds questions to existing ones. Duplicates are not checked.",
+
   "com_quiz.settings.heading": "Quiz Settings",
   "com_quiz.settings.saved": "Settings saved.",
+
+  "com_quiz.success.imported": "Import complete: {created} questions added, {errors} errors.",
 
   "com_quiz.success.category_created": "Category created.",
   "com_quiz.success.category_updated": "Category saved.",

@@ -93,8 +93,16 @@
   "com_quiz.admin.attempt.passed": "Splněno",
   "com_quiz.admin.attempt.failed": "Nesplněno",
 
+  "com_quiz.admin.import.heading": "Import otázek z JSON",
+  "com_quiz.admin.import.file_label": "JSON soubor",
+  "com_quiz.admin.import.hint": "Soubor musí být seznam objektů s klíči: question, answers (pole), correct (index), category, info.",
+  "com_quiz.admin.import.submit": "Importovat",
+  "com_quiz.admin.import.warning": "Import přidá otázky ke stávajícím. Duplicity nejsou kontrolovány.",
+
   "com_quiz.settings.heading": "Nastavení kvízů",
   "com_quiz.settings.saved": "Nastavení bylo uloženo.",
+
+  "com_quiz.success.imported": "Import dokončen: {created} otázek přidáno, {errors} chyb.",
 
   "com_quiz.success.category_created": "Kategorie byla vytvořena.",
   "com_quiz.success.category_updated": "Kategorie byla uložena.",
