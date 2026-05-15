@@ -130,7 +130,9 @@ async def categories_new_submit(
             sort_order=int(str(form.get("sort_order", "0")) or "0"),
         )
         await create_category(db, payload)
+        await db.commit()
     except (QuizError, ValueError) as exc:
+        await db.rollback()
         key = exc.key if isinstance(exc, QuizError) else "com_quiz.error.invalid_input"
         kwargs = exc.kwargs if isinstance(exc, QuizError) else {}
         _flash(request, "danger", ct(key, **kwargs))
@@ -178,7 +180,9 @@ async def categories_edit_submit(
             sort_order=int(str(form.get("sort_order", str(cat.sort_order))) or "0"),
         )
         await update_category(db, cat, payload)
+        await db.commit()
     except (QuizError, ValueError) as exc:
+        await db.rollback()
         key = exc.key if isinstance(exc, QuizError) else "com_quiz.error.invalid_input"
         kwargs = exc.kwargs if isinstance(exc, QuizError) else {}
         _flash(request, "danger", ct(key, **kwargs))
@@ -195,6 +199,7 @@ async def categories_delete(
     db: AsyncSession = Depends(get_db_session),
 ) -> Response:
     await delete_category(db, cat_id)
+    await db.commit()
     ct = await _ct(db)
     _flash(request, "success", ct("com_quiz.success.category_deleted"))
     return RedirectResponse("/admin/com_quiz/categories", status_code=303)
@@ -258,7 +263,9 @@ async def questions_new_submit(
             correct_index=correct_index,
         )
         await create_question(db, payload)
+        await db.commit()
     except (QuizError, ValueError) as exc:
+        await db.rollback()
         key = exc.key if isinstance(exc, QuizError) else "com_quiz.error.invalid_input"
         kwargs = exc.kwargs if isinstance(exc, QuizError) else {}
         _flash(request, "danger", ct(key, **kwargs))
@@ -312,7 +319,9 @@ async def questions_edit_submit(
             correct_index=correct_index,
         )
         await update_question(db, question, payload)
+        await db.commit()
     except (QuizError, ValueError) as exc:
+        await db.rollback()
         key = exc.key if isinstance(exc, QuizError) else "com_quiz.error.invalid_input"
         kwargs = exc.kwargs if isinstance(exc, QuizError) else {}
         _flash(request, "danger", ct(key, **kwargs))
@@ -329,6 +338,7 @@ async def questions_delete(
     db: AsyncSession = Depends(get_db_session),
 ) -> Response:
     await delete_question(db, q_id)
+    await db.commit()
     ct = await _ct(db)
     _flash(request, "success", ct("com_quiz.success.question_deleted"))
     return RedirectResponse("/admin/com_quiz/questions", status_code=303)
@@ -395,7 +405,9 @@ async def tests_new_submit(
             sort_order=int(str(form.get("sort_order", "0")) or "0"),
         )
         await create_test(db, payload)
+        await db.commit()
     except (QuizError, ValueError) as exc:
+        await db.rollback()
         key = exc.key if isinstance(exc, QuizError) else "com_quiz.error.invalid_input"
         kwargs = exc.kwargs if isinstance(exc, QuizError) else {}
         _flash(request, "danger", ct(key, **kwargs))
@@ -452,7 +464,9 @@ async def tests_edit_submit(
             sort_order=int(str(form.get("sort_order", str(test.sort_order))) or "0"),
         )
         await update_test(db, test, payload)
+        await db.commit()
     except (QuizError, ValueError) as exc:
+        await db.rollback()
         key = exc.key if isinstance(exc, QuizError) else "com_quiz.error.invalid_input"
         kwargs = exc.kwargs if isinstance(exc, QuizError) else {}
         _flash(request, "danger", ct(key, **kwargs))
@@ -469,6 +483,7 @@ async def tests_delete(
     db: AsyncSession = Depends(get_db_session),
 ) -> Response:
     await delete_test(db, test_id)
+    await db.commit()
     ct = await _ct(db)
     _flash(request, "success", ct("com_quiz.success.test_deleted"))
     return RedirectResponse("/admin/com_quiz/tests", status_code=303)
