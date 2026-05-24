@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.admin.deps import CurrentAdminUser
 from src.api.admin.render import admin_render
+from src.core.acl import require_admin_permission
 from src.core.system_settings import get_runtime_settings
 from src.core.templates import make_t
 from src.database.base import get_db_session
@@ -39,7 +40,11 @@ from .service import (
     update_test,
 )
 
-router = APIRouter(prefix="/admin/com_quiz", tags=["com_quiz"])
+router = APIRouter(
+    prefix="/admin/com_quiz",
+    tags=["com_quiz"],
+    dependencies=[Depends(require_admin_permission("quiz.manage"))],
+)
 
 
 async def _ct(db: AsyncSession):
