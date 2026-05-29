@@ -4,7 +4,7 @@
   "type": "component",
   "vendor": "klucon",
   "extension_id": "klucon/com_quiz",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "display_name": "Kvízy a testy",
   "display_name_key": "components.name.com_quiz",
   "description": "Systém pro tvorbu a správu testů a kvízů s anonymním hodnocením a exportem výsledků do PDF.",
@@ -21,7 +21,10 @@
     "core_min": "0.1.0",
     "core_max": null,
     "python": ">=3.12",
-    "database": ["mysql", "postgresql"]
+    "database": [
+      "mysql",
+      "postgresql"
+    ]
   },
   "package": {
     "python_package": "com_quiz",
@@ -60,7 +63,10 @@
   "i18n": {
     "domain": "com_quiz",
     "locales_path": "i18n",
-    "required_locales": ["cs_CZ", "en_GB"]
+    "required_locales": [
+      "cs_CZ",
+      "en_GB"
+    ]
   },
   "migrations": {
     "enabled": false,
@@ -68,11 +74,20 @@
   },
   "security": {
     "requires_signature": true,
-    "capabilities": ["database.write", "admin.routes", "web.views"]
+    "capabilities": [
+      "database.write",
+      "admin.routes",
+      "web.views"
+    ]
   },
   "marketplace": {
     "category": "content",
-    "tags": ["quiz", "test", "questions", "pdf"],
+    "tags": [
+      "quiz",
+      "test",
+      "questions",
+      "pdf"
+    ],
     "featured": false
   },
   "dashboard": {
@@ -87,7 +102,12 @@
   },
   "admin_url": "/admin/com_quiz",
   "min_cms_version": "0.1.0",
-  "categories": ["content"],
-  "supported_locales": ["cs_CZ", "en_GB"],
+  "categories": [
+    "content"
+  ],
+  "supported_locales": [
+    "cs_CZ",
+    "en_GB"
+  ],
   "changelog": "Admin sekce je chráněná ACL oprávněním quiz.manage."
 }
